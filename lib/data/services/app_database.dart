@@ -33,7 +33,8 @@ class AppDatabase {
     activity TEXT NOT NULL,
     dette INTEGER,
     depense INTEGER,
-    gain INTEGER
+    gain INTEGER,
+    date TEXT
     )''');
   }
 

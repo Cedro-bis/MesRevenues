@@ -1,5 +1,8 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:timeago/timeago.dart' as timeago;
+import 'package:mesrevenus/pages/set_date.dart';
 import 'package:mesrevenus/pages/tableau_de_bord.dart';
 import 'package:mesrevenus/data/data.dart';
 
@@ -11,6 +14,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  SetDate setDate = SetDate(date: DateTime.now());
   TextEditingController activity = TextEditingController();
   TextEditingController dette = TextEditingController();
   TextEditingController depense = TextEditingController();
@@ -68,6 +72,7 @@ class _HomePageState extends State<HomePage> {
             if (snp.data!.isEmpty) {
               return Center(
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Center(child: Text('Vous n\'avez pas d\'activité')),
                   ],
@@ -93,7 +98,17 @@ class _HomePageState extends State<HomePage> {
                                 spacing: 8,
                                 children: [
                                   IconButton(
-                                    onPressed: () {},
+                                    onPressed: () async {
+                                      await AppDatabase.instance.updateData(
+                                        MyModele(
+                                          activity: myVar.activity,
+                                          dette: myVar.dette,
+                                          depense: myVar.depense,
+                                          gain: myVar.gain,
+                                          date: myVar.date,
+                                        ),
+                                      );
+                                    },
                                     icon: Icon(Icons.edit, color: Colors.green),
                                   ),
                                   Text(
@@ -177,7 +192,15 @@ class _HomePageState extends State<HomePage> {
                     child: ListTile(
                       leading: Icon(Icons.calendar_month),
                       title: Text('${myVar.activity}'),
-                      subtitle: Text('Vous avez enregistré ${myVar.gain} FC'),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Vous avez enregistré ${myVar.gain} FC'),
+                          Text(
+                            "${DateFormat('dd/MM/yyyy à HH:mm').format(myVar.date)}",
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 );
@@ -211,14 +234,17 @@ class _HomePageState extends State<HomePage> {
             ),
             TextField(
               controller: gain,
+              keyboardType: TextInputType.numberWithOptions(),
               decoration: InputDecoration(labelText: 'Gain'),
             ),
             TextField(
               controller: depense,
+              keyboardType: TextInputType.numberWithOptions(),
               decoration: InputDecoration(labelText: 'Dépenses'),
             ),
             TextField(
               controller: dette,
+              keyboardType: TextInputType.numberWithOptions(),
               decoration: InputDecoration(labelText: 'Dette'),
             ),
           ],
@@ -238,8 +264,14 @@ class _HomePageState extends State<HomePage> {
                   dette: int.parse(dette.text),
                   depense: int.parse(depense.text),
                   gain: int.parse(gain.text),
+                  date: DateTime.now(),
                 ),
               );
+              if (activity.text.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Veuillez préciser l\'activité')),
+                );
+              } else {}
               Navigator.of(context).pushAndRemoveUntil(
                 MaterialPageRoute(builder: (builder) => HomePage()),
                 (predicate) => false,
