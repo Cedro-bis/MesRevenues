@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mesrevenus/data/data.dart';
+import 'package:mesrevenus/pages/dette_detaille.dart';
 
 class TableauDeBord extends StatelessWidget {
   const TableauDeBord({super.key});
@@ -59,28 +60,38 @@ class TableauDeBord extends StatelessWidget {
                           ),
                         ),
                         Expanded(
-                          child: Container(
-                            height: 200,
-                            color: Colors.red.shade300,
-                            child: Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    'Vos dette',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20,
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (builder) => DetteDetaille(),
+                                ),
+                              );
+                            },
+                            child: Container(
+                              height: 200,
+                              color: Colors.red.shade300,
+                              child: Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      'Vos dette',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 20,
+                                      ),
                                     ),
-                                  ),
-                                  SizedBox(height: 12),
-                                  Text(
-                                    '$sommeDette',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
+                                    SizedBox(height: 12),
+                                    Text(
+                                      '$sommeDette',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
                           ),
@@ -147,6 +158,39 @@ class TableauDeBord extends StatelessWidget {
                       ],
                     ),
                   ],
+                );
+              },
+            ),
+
+            SizedBox(height: 23),
+            Text(
+              'Vos activités',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 12),
+            FutureBuilder<List<MyModele>>(
+              future: AppDatabase.instance.readData(),
+              builder: (ctx, snp) {
+                if (!snp.hasData)
+                  return Center(child: CircularProgressIndicator());
+                List<MyModele> data = snp.data!;
+                if (data.isEmpty)
+                  return Center(child: Text('Aucune activité enregistrée'));
+                return ListView.builder(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  itemCount: data.length,
+                  itemBuilder: (ctx, index) {
+                    MyModele item = data[index];
+                    return Card(
+                      child: ListTile(
+                        title: Text(item.activity),
+                        subtitle: Text(
+                          'Dette: ${item.dette}, Dépense: ${item.depense}, Gain: ${item.gain}, Date: ${item.date.toLocal().toString().split(' ')[0]}',
+                        ),
+                      ),
+                    );
+                  },
                 );
               },
             ),

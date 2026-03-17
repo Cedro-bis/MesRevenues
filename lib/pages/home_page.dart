@@ -1,7 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:timeago/timeago.dart' as timeago;
 import 'package:mesrevenus/pages/set_date.dart';
 import 'package:mesrevenus/pages/tableau_de_bord.dart';
 import 'package:mesrevenus/data/data.dart';
@@ -101,10 +100,19 @@ class _HomePageState extends State<HomePage> {
                                     onPressed: () async {
                                       await AppDatabase.instance.updateData(
                                         MyModele(
-                                          activity: myVar.activity,
-                                          dette: myVar.dette,
-                                          depense: myVar.depense,
-                                          gain: myVar.gain,
+                                          id: myVar.id,
+                                          activity: activity.text.isEmpty
+                                              ? myVar.activity
+                                              : activity.text,
+                                          dette: dette.text.isEmpty
+                                              ? myVar.dette
+                                              : int.parse(dette.text),
+                                          depense: depense.text.isEmpty
+                                              ? myVar.depense
+                                              : int.parse(depense.text),
+                                          gain: gain.text.isEmpty
+                                              ? myVar.gain
+                                              : int.parse(gain.text),
                                           date: myVar.date,
                                         ),
                                       );
